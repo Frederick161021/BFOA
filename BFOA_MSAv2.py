@@ -17,11 +17,11 @@ tempBacteria = bacteria(path)            #bacteria temporal para validaciones
 original = bacteria(path)                #bacteria original sin gaps
 globalNFE = 0      #numero de evaluaciones de la funcion objetivo
 
-dAttr= 0.2 #0.1
+dAttr= 0.1 #0.1
 wAttr= 0.2 #0.2
-hRep=dAttr
-# hRep=0.2
-wRep= 15    #10
+# hRep=dAttr
+hRep=0.2
+wRep= 13    #10
 
 
 def clonaBest(veryBest, best):
