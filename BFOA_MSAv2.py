@@ -5,7 +5,7 @@ import numpy
 
 poblacion = []
 # path = "C:\secuenciasBFOA\multiFasta.fasta"
-path = "multiFasta.fasta"
+path = "SetA.fasta"
 numeroDeBacterias = 15 #Se aumento la poblacion original de 6 a 15
 numRandomBacteria = 2 #Se aumento la aparcion de bacterias de 1 as 2
 iteraciones = 30

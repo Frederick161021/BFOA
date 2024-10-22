@@ -55,24 +55,27 @@ class bacteria():
 
     #Este meotodo sera modificado con el objetivo de no tener una enorme cantidad de gaps al final
     def cuadra2(self):
-        """rellena con gaps las secuencias mas cortas"""
-        import numpy
+        """Rellena las secuencias más cortas con gaps, asegurando que todas tengan la misma longitud."""
         seq = self.matrix.seqs
-        maxLen = len(max(seq, key=len))
-        # print (maxLen)
-        for i in range(len(seq)):
-            # if len(seq[i]) < maxLen: #original
-            #     seq[i] = seq[i] + "-"*(maxLen-len(seq[i])) #original
-            diferencia = maxLen-len(seq[i])
-            if diferencia > 0:
-                for j in range(diferencia):
-                    posicion = random.randint(0, len(seq[i]))
-                    parte1 = seq[i][:posicion]
-                    parte2 = seq[i][posicion:]
-                    temp = "-".join([parte1, parte2])
-                    seq[i] = temp
+        maxLen = len(max(seq, key=len))  # Longitud máxima de las secuencias
 
-        self.matrix.seqs = numpy.array(seq)
+        for i in range(len(seq)):
+            # Calcula la diferencia entre la longitud máxima y la longitud actual
+            diferencia = maxLen - len(seq[i])
+
+            # Inserta gaps solo si la secuencia es más corta que la longitud máxima
+            if diferencia > 0:
+                # Crea una lista de posiciones para insertar gaps
+                for _ in range(diferencia):
+                    # Determina una posición aleatoria para insertar el gap
+                    posicion = random.randint(0, len(seq[i]))  # Puede ser igual a la longitud
+
+                    # Inserta el gap en la posición seleccionada
+                    seq[i] = seq[i][:posicion] + "-" + seq[i][posicion:]
+
+        self.matrix.seqs = numpy.array(seq)  # Asegúrate de que todas las secuencias tengan la misma longitud
+
+
 
 
     """metodo para saber si alguna columna de self.matrix tiene  gap en todos los elementos"""
@@ -116,18 +119,35 @@ class bacteria():
     def autoEvalua(self):
         evaluador = evaluadorBlosum()
         score = 0
+        conserved_columns = []
+
+        # Evaluar cada columna
         for i in range(len(self.matrix.seqs[0])):
             column = self.getColumn(i)
-            """cuenta gaps de columna"""
             gapCount = column.count("-")
-            """eliminar gaps de columna"""
-            column = [x for x in column if x != "-"]
-            """metodo para recorrer todos los pares unicos y enviarlos a evaluador"""
-            pares = self.obtener_pares_unicos(column)
+            column_no_gaps = [x for x in column if x != "-"]
+
+            # Contar la frecuencia de cada aminoácido/nucleótido
+            frequency = {}
+            for char in column_no_gaps:
+                if char in frequency:
+                    frequency[char] += 1
+                else:
+                    frequency[char] = 1
+
+            # Evaluar la conservación
+            most_common = max(frequency.values(), default=0)
+            conservation_score = (most_common / len(column_no_gaps)) if column_no_gaps else 0
+
+            # Penalizar si hay gaps
+            score -= gapCount * 4
+            score += conservation_score * 3  # Aumentar el score por conservación
+
+            # Evaluar pares únicos
+            pares = self.obtener_pares_unicos(column_no_gaps)
             for par in pares:
                 score += evaluador.getScore(par[0], par[1])
-            """si hay gaps en la columna, se penaliza"""
-            score -= gapCount*2
+
         self.blosumScore = score
         self.NFE += 1
 
